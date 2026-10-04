@@ -47,10 +47,11 @@ class MessageTagResolverTest {
     }
 
     @Test
-    fun `label keyword outside of the default range should be treated as custom keyword`() {
-        val result = testSubject.resolve(setOf("\$label6"))
+    fun `label keyword outside of the default range should be hidden unless declared`() {
+        assertThat(testSubject.resolve(setOf("\$label6"))).isEmpty()
 
-        assertThat(result.single().name).isEqualTo("\$label6")
+        val settings = MessageTagSettings(listOf(MessageTagSetting(keyword = "\$label6")))
+        assertThat(testSubject.resolve(setOf("\$label6"), settings).single().name).isEqualTo("\$label6")
     }
 
     @Test
@@ -90,6 +91,31 @@ class MessageTagResolverTest {
         val result = testSubject.resolve(setOf("Project-X"), settings)
 
         assertThat(result.single().name).isEqualTo("Project X")
+    }
+
+    @Test
+    fun `keywords starting with dollar sign should be hidden unless they are default tags`() {
+        val result = testSubject.resolve(setOf("\$Junk", "\$hasattachment", "\$Important", "\$label3", "Visible"))
+
+        assertThat(result.map { it.keyword }).containsExactly("\$label3", "Visible")
+    }
+
+    @Test
+    fun `keyword starting with dollar sign should be shown when declared in settings`() {
+        val settings = MessageTagSettings(listOf(MessageTagSetting(keyword = "\$important", name = "Priority")))
+
+        val result = testSubject.resolve(setOf("\$Important", "\$Junk"), settings)
+
+        assertThat(result).containsExactly(
+            MessageTag(keyword = "\$Important", name = "Priority", color = 0xFF607D8B.toInt()),
+        )
+    }
+
+    @Test
+    fun `hidden keyword should not affect default label keywords of other casing`() {
+        val result = testSubject.resolve(setOf("\$Label5"))
+
+        assertThat(result.single().name).isEqualTo("Later")
     }
 
     @Test

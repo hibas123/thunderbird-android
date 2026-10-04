@@ -290,6 +290,16 @@ class MessageListAdapterTest : RobolectricTest() {
     }
 
     @Test
+    fun withOnlyUndeclaredDollarKeywords_shouldHideTagsView() {
+        val adapter = createAdapter()
+        val messageListItem = createMessageListItem(keywords = setOf("\$Junk", "\$hasattachment"))
+
+        val view = adapter.createAndBindView(messageListItem)
+
+        assertThat(view.tagsView).isGone()
+    }
+
+    @Test
     fun rebindingWithoutKeywords_shouldHideTagsView() {
         val adapter = createAdapter()
         val view = adapter.createAndBindView(createMessageListItem(keywords = setOf("\$label1")))
