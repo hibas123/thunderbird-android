@@ -7,14 +7,14 @@ import net.thunderbird.core.logging.Logger
 import net.thunderbird.core.preference.PreferenceChangeBroker
 import net.thunderbird.core.preference.PreferenceChangeSubscriber
 import net.thunderbird.core.preference.PreferenceScope
-import net.thunderbird.core.preference.storage.Storage
 import net.thunderbird.core.preference.storage.StorageEditor
+import net.thunderbird.core.preference.storage.StoragePersister
 
 private const val TAG = "DefaultMessageTagSettingsPreferenceManager"
 
 class DefaultMessageTagSettingsPreferenceManager(
     private val logger: Logger,
-    private val storage: Storage,
+    private val storagePersister: StoragePersister,
     private val storageEditor: StorageEditor,
     preferenceChangeBroker: PreferenceChangeBroker,
 ) : MessageTagSettingsPreferenceManager, PreferenceChangeSubscriber {
@@ -36,6 +36,8 @@ class DefaultMessageTagSettingsPreferenceManager(
     override fun getConfigFlow(): Flow<MessageTagSettings> = configState
 
     private fun loadConfig(): MessageTagSettings {
+        // Always load fresh values. A cached Storage instance would not contain changes made after it was created.
+        val storage = storagePersister.loadValues()
         return MessageTagSettingsCodec.decode(storage.getStringOrNull(MessageTagSettingKey.MessageTags.value))
     }
 

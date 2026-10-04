@@ -1,6 +1,7 @@
 package net.thunderbird.app.common.feature.mail.message
 
 import com.fsck.k9.K9
+import com.fsck.k9.Preferences
 import com.fsck.k9.mail.Part
 import com.fsck.k9.mailstore.DefaultAttachmentViewInfoMapper
 import com.fsck.k9.ui.helper.SizeFormatter
@@ -34,8 +35,8 @@ internal val mailMessageModule = module {
     single<MessageTagSettingsPreferenceManager> {
         DefaultMessageTagSettingsPreferenceManager(
             logger = get(),
-            storage = get(),
-            storageEditor = get(),
+            storagePersister = get(),
+            storageEditor = get<Preferences>().createStorageEditor(),
             preferenceChangeBroker = get(),
         )
     }
