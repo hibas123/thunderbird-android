@@ -214,6 +214,7 @@ ORDER BY $sortOrder
     }
 }
 
+@Suppress("MagicNumber")
 private class CursorMessageAccessor(val cursor: Cursor, val includesThreadCount: Boolean) : MessageDetailsAccessor {
     override val id: Long
         get() = cursor.getLong(0)

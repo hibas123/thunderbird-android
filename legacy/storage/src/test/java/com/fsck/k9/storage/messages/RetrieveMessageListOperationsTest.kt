@@ -443,7 +443,7 @@ class RetrieveMessageListOperationsTest : RobolectricTest() {
 
         assertThat(result).containsExactlyInAnyOrder(
             messageId to setOf("\$label1", "Custom"),
-            otherMessageId to emptySet(),
+            otherMessageId to emptySet<String>(),
         )
     }
 

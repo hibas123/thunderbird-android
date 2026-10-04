@@ -8,6 +8,7 @@ import net.thunderbird.core.common.mail.Flag
 /**
  * [MessageStore] wrapper that triggers notifications on certain changes to the message store.
  */
+@Suppress("TooManyFunctions")
 class NotifierMessageStore(
     private val messageStore: MessageStore,
     private val localStore: LocalStore,
