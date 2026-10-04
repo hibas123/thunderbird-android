@@ -7,6 +7,8 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import kotlin.test.Test
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSetting
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettings
 
 class MessageTagResolverTest {
     private val testSubject = MessageTagResolver(
@@ -56,6 +58,38 @@ class MessageTagResolverTest {
         val result = testSubject.resolve(setOf("zebra", "\$label3", "Apple", "\$label1"))
 
         assertThat(result.map { it.name }).containsExactly("Important", "Personal", "Apple", "zebra")
+    }
+
+    @Test
+    fun `customized name and color should override defaults`() {
+        val settings = MessageTagSettings(
+            listOf(MessageTagSetting(keyword = "\$label1", name = "Urgent", color = 0xFF112233.toInt())),
+        )
+
+        val result = testSubject.resolve(setOf("\$label1"), settings)
+
+        assertThat(result).containsExactly(
+            MessageTag(keyword = "\$label1", name = "Urgent", color = 0xFF112233.toInt()),
+        )
+    }
+
+    @Test
+    fun `customization with only a color should keep the default name`() {
+        val settings = MessageTagSettings(listOf(MessageTagSetting(keyword = "\$label2", color = 0xFF010203.toInt())))
+
+        val result = testSubject.resolve(setOf("\$label2"), settings)
+
+        assertThat(result.single().name).isEqualTo("Work")
+        assertThat(result.single().color).isEqualTo(0xFF010203.toInt())
+    }
+
+    @Test
+    fun `customization should apply to custom keywords ignoring case`() {
+        val settings = MessageTagSettings(listOf(MessageTagSetting(keyword = "project-x", name = "Project X")))
+
+        val result = testSubject.resolve(setOf("Project-X"), settings)
+
+        assertThat(result.single().name).isEqualTo("Project X")
     }
 
     @Test

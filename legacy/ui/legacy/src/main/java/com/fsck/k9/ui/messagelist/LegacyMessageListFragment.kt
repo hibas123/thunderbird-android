@@ -100,6 +100,7 @@ import net.thunderbird.core.logging.Logger
 import net.thunderbird.components.core.outcome.Outcome
 import net.thunderbird.core.preference.GeneralSettingsManager
 import net.thunderbird.core.preference.display.visualSettings.message.list.DisplayMessageListSettings
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettingsPreferenceManager
 import net.thunderbird.core.preference.interaction.InteractionSettings
 import net.thunderbird.core.ui.theme.api.FeatureThemeProvider
 import net.thunderbird.feature.account.AccountId
@@ -161,6 +162,7 @@ class LegacyMessageListFragment :
     private val recentChangesViewModel: RecentChangesViewModel by viewModel()
 
     private val generalSettingsManager: GeneralSettingsManager by inject()
+    private val messageTagSettingsManager: MessageTagSettingsPreferenceManager by inject()
     private val sortTypeToastProvider: SortTypeToastProvider by inject()
     private val folderNameFormatter: FolderNameFormatter by inject { parametersOf(requireContext()) }
     private val messagingController: MessagingControllerWrapper by inject()
@@ -320,6 +322,11 @@ class LegacyMessageListFragment :
 
         adapter = createMessageListAdapter()
 
+        messageTagSettingsManager.getConfigFlow()
+            .drop(1)
+            .onEach { adapter.refreshTags() }
+            .launchIn(lifecycleScope)
+
         var observedDateTimeFormat = messageListSettings.dateTimeFormat
         generalSettingsManager.getSettingsFlow()
             /**
@@ -417,6 +424,7 @@ class LegacyMessageListFragment :
             formatDate = { timestamp ->
                 relativeDateTimeFormatter.formatDate(timestamp, messageListSettings.dateTimeFormat)
             },
+            messageTagSettings = messageTagSettingsManager::getConfig,
         ).apply {
             activeMessage = this@LegacyMessageListFragment.activeMessage
         }

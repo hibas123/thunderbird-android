@@ -26,6 +26,8 @@ import com.fsck.k9.mail.ConnectionSecurity
 import com.fsck.k9.mail.ServerSettings
 import com.fsck.k9.ui.R
 import com.fsck.k9.ui.messagelist.item.MessageViewHolder
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSetting
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettings
 import com.google.android.material.textview.MaterialTextView
 import kotlin.time.ExperimentalTime
 import net.thunderbird.core.android.account.Identity
@@ -276,6 +278,18 @@ class MessageListAdapterTest : RobolectricTest() {
     }
 
     @Test
+    fun withCustomizedTag_shouldShowCustomName() {
+        val adapter = createAdapter(
+            messageTagSettings = MessageTagSettings(listOf(MessageTagSetting("\$label1", name = "Urgent"))),
+        )
+        val messageListItem = createMessageListItem(keywords = setOf("\$label1"))
+
+        val view = adapter.createAndBindView(messageListItem)
+
+        assertThat(view.tagsView.text.toString()).isEqualTo("Urgent")
+    }
+
+    @Test
     fun rebindingWithoutKeywords_shouldHideTagsView() {
         val adapter = createAdapter()
         val view = adapter.createAndBindView(createMessageListItem(keywords = setOf("\$label1")))
@@ -450,6 +464,7 @@ class MessageListAdapterTest : RobolectricTest() {
         showAccountIndicator: Boolean = false,
         density: UiDensity = UiDensity.Default,
         dateTimeFormat: MessageListDateTimeFormat = DATE_TIME_FORMAT,
+        messageTagSettings: MessageTagSettings = MessageTagSettings(),
     ): MessageListAdapter {
         val appearance = MessageListAppearance(
             fontSizes,
@@ -477,6 +492,7 @@ class MessageListAdapterTest : RobolectricTest() {
             avatarMonogramCreator = mock(),
             contactRepository = mock(),
             formatDate = { "12:34" },
+            messageTagSettings = { messageTagSettings },
         )
     }
 

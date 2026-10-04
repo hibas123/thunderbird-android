@@ -30,6 +30,7 @@ import com.google.android.material.textview.MaterialTextView
 import java.util.Locale
 import kotlin.math.max
 import net.thunderbird.core.preference.display.visualSettings.message.list.UiDensity
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettings
 import net.thunderbird.feature.mail.message.list.R as MessageListR
 
 @Suppress("TooManyFunctions")
@@ -40,6 +41,7 @@ class MessageViewHolder(
     private val res: Resources,
     private val contactsPictureLoader: ContactPictureLoader,
     private val colors: MessageViewHolderColors,
+    private val messageTagSettings: () -> MessageTagSettings,
 ) : MessageListViewHolder(view) {
 
     var uniqueId: Long = -1L
@@ -168,7 +170,7 @@ class MessageViewHolder(
     }
 
     private fun bindTags(keywords: Set<String>) {
-        val tags = tagResolver.resolve(keywords)
+        val tags = tagResolver.resolve(keywords, messageTagSettings())
         if (tags.isEmpty()) {
             tagsView.isVisible = false
             tagsView.text = null
@@ -329,6 +331,7 @@ class MessageViewHolder(
             onLongClickListener: View.OnLongClickListener,
             contactPictureContainerClickListener: View.OnClickListener,
             starClickListener: View.OnClickListener,
+            messageTagSettings: () -> MessageTagSettings,
         ): MessageViewHolder {
             val view = layoutInflater.inflate(R.layout.message_list_item, parent, false)
             view.setOnClickListener(onClickListener)
@@ -341,6 +344,7 @@ class MessageViewHolder(
                 res = res,
                 contactsPictureLoader = contactsPictureLoader,
                 colors = colors,
+                messageTagSettings = messageTagSettings,
             )
             val appearance = appearance()
 

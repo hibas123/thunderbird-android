@@ -23,6 +23,7 @@ import com.fsck.k9.ui.messagelist.item.MessageViewHolderColors
 import net.thunderbird.core.featureflag.FeatureFlagProvider
 import net.thunderbird.core.featureflag.FeatureFlagResult
 import net.thunderbird.core.featureflag.keys.GeneratedFeatureFlagKey
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettings
 import net.thunderbird.core.ui.theme.api.FeatureThemeProvider
 import net.thunderbird.feature.account.avatar.AvatarMonogramCreator
 import net.thunderbird.feature.notification.api.content.InAppNotification
@@ -48,6 +49,7 @@ class MessageListAdapter internal constructor(
     private val contactRepository: ContactRepository,
     private val avatarMonogramCreator: AvatarMonogramCreator,
     private val formatDate: (Long) -> String,
+    private val messageTagSettings: () -> MessageTagSettings,
 ) : RecyclerView.Adapter<MessageListViewHolder>() {
 
     val colors: MessageViewHolderColors = MessageViewHolderColors.resolveColors(theme)
@@ -175,6 +177,10 @@ class MessageListAdapter internal constructor(
         notifyItemRangeChanged(0, itemCount)
     }
 
+    fun refreshTags() {
+        notifyItemRangeChanged(0, itemCount)
+    }
+
     private fun getItem(position: Int): MessageListItem = (viewItems[position] as MessageListViewItem.Message).item
 
     fun getItemById(uniqueId: Long): MessageListItem? {
@@ -246,6 +252,7 @@ class MessageListAdapter internal constructor(
             onLongClickListener = messageLongClickedListener,
             contactPictureContainerClickListener = contactPictureContainerClickListener,
             starClickListener = starClickListener,
+            messageTagSettings = messageTagSettings,
         )
 
     private fun createComposableMessageViewHolder(parent: ViewGroup): MessageListViewHolder =
