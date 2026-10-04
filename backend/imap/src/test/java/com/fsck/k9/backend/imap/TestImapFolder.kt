@@ -31,6 +31,7 @@ open class TestImapFolder(override val serverId: String) : ImapFolder {
 
     private val messages = mutableMapOf<Long, Message>()
     private val messageFlags = mutableMapOf<Long, MutableSet<Flag>>()
+    private val messageKeywords = mutableMapOf<Long, Set<String>>()
     private var uidValidity: Long? = null
 
     fun addMessage(uid: Long, message: Message) {
@@ -44,9 +45,16 @@ open class TestImapFolder(override val serverId: String) : ImapFolder {
         messageCount = messages.size
     }
 
+    fun setKeywords(uid: Long, keywords: Set<String>) {
+        require(messages.containsKey(uid)) { "Unknown message with UID $uid" }
+
+        messageKeywords[uid] = keywords
+    }
+
     fun removeAllMessages() {
         messages.clear()
         messageFlags.clear()
+        messageKeywords.clear()
     }
 
     fun setUidValidity(value: Long) {
@@ -107,6 +115,10 @@ open class TestImapFolder(override val serverId: String) : ImapFolder {
 
             val flags = messageFlags[uid].orEmpty().toSet()
             imapMessage.setFlags(flags, true)
+
+            if (FetchProfile.Item.FLAGS in fetchProfile) {
+                imapMessage.keywords = messageKeywords[uid].orEmpty()
+            }
 
             val storedMessage = this.messages[uid] ?: error("Message $uid not found")
             for (header in storedMessage.headers) {

@@ -37,7 +37,12 @@ SELECT
   answered, 
   forwarded, 
   attachment_count, 
-  root
+  root,
+  (
+    SELECT group_concat(keyword, char(31)) 
+    FROM message_keywords 
+    WHERE message_keywords.message_id = messages.id
+  ) AS keywords
 FROM messages
 JOIN threads ON (threads.message_id = messages.id)
 LEFT JOIN FOLDERS ON (folders.id = messages.folder_id)
@@ -94,6 +99,19 @@ SELECT
   aggregated.forwarded AS forwarded, 
   aggregated.attachment_count AS attachment_count, 
   root, 
+  (
+    SELECT group_concat(keyword, char(31)) 
+    FROM (
+      SELECT DISTINCT message_keywords.keyword AS keyword 
+      FROM message_keywords
+      JOIN messages thread_messages ON (
+        thread_messages.id = message_keywords.message_id 
+        AND thread_messages.empty = 0 AND thread_messages.deleted = 0
+      )
+      JOIN threads thread_entries ON (thread_entries.message_id = thread_messages.id)
+      WHERE thread_entries.root = threads.root
+    )
+  ) AS keywords,
   aggregated.thread_count AS thread_count
 FROM (
   SELECT 
@@ -166,7 +184,12 @@ SELECT
   answered, 
   forwarded, 
   attachment_count, 
-  root
+  root,
+  (
+    SELECT group_concat(keyword, char(31)) 
+    FROM message_keywords 
+    WHERE message_keywords.message_id = messages.id
+  ) AS keywords
 FROM threads 
 JOIN messages ON (messages.id = threads.message_id)
 LEFT JOIN FOLDERS ON (folders.id = messages.folder_id)
@@ -231,9 +254,13 @@ private class CursorMessageAccessor(val cursor: Cursor, val includesThreadCount:
         get() = cursor.getInt(15) > 0
     override val threadRoot: Long
         get() = cursor.getLong(16)
+    override val keywords: Set<String>
+        get() = cursor.getString(17)?.split(KEYWORD_SEPARATOR)?.toSet().orEmpty()
     override val threadCount: Int
-        get() = if (includesThreadCount) cursor.getInt(17) else 0
+        get() = if (includesThreadCount) cursor.getInt(18) else 0
 }
+
+private const val KEYWORD_SEPARATOR = '\u001F'
 
 private val AGGREGATED_MESSAGES_COLUMNS = arrayOf(
     "date",

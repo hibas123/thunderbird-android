@@ -213,3 +213,12 @@ fun SQLiteDatabase.createMessagePart(
         }
     }
 }
+
+fun SQLiteDatabase.createKeyword(messageId: Long, keyword: String) {
+    val values = ContentValues().apply {
+        put("message_id", messageId)
+        put("keyword", keyword)
+    }
+
+    insertOrThrow("message_keywords", null, values)
+}

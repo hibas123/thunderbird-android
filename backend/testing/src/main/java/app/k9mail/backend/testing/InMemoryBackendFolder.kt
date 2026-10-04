@@ -19,6 +19,7 @@ class InMemoryBackendFolder(override var name: String, var type: FolderType) : B
     val extraNumbers: MutableMap<String, Long> = mutableMapOf()
     private val messages = mutableMapOf<String, Message>()
     private val messageFlags = mutableMapOf<String, MutableSet<Flag>>()
+    private val messageKeywords = mutableMapOf<String, Set<String>>()
     private var moreMessages: MoreMessages = MoreMessages.UNKNOWN
     private var status: String? = null
     private var lastChecked = 0L
@@ -76,6 +77,7 @@ class InMemoryBackendFolder(override var name: String, var type: FolderType) : B
         for (messageServerId in messageServerIds) {
             messages.remove(messageServerId)
             messageFlags.remove(messageServerId)
+            messageKeywords.remove(messageServerId)
         }
     }
 
@@ -103,6 +105,14 @@ class InMemoryBackendFolder(override var name: String, var type: FolderType) : B
 
     override fun getMessageFlags(messageServerId: String): Set<Flag> {
         return messageFlags[messageServerId] ?: error("Message $messageServerId not found")
+    }
+
+    override fun getMessageKeywords(messageServerId: String): Set<String> {
+        return messageKeywords[messageServerId].orEmpty()
+    }
+
+    override fun setMessageKeywords(messageServerId: String, keywords: Set<String>) {
+        messageKeywords[messageServerId] = keywords
     }
 
     override fun setMessageFlag(messageServerId: String, flag: Flag, value: Boolean) {

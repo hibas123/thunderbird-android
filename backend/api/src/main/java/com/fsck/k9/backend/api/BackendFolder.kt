@@ -21,6 +21,16 @@ interface BackendFolder {
     fun isMessagePresent(messageServerId: String): Boolean
     fun getMessageFlags(messageServerId: String): Set<Flag>
     fun setMessageFlag(messageServerId: String, flag: Flag, value: Boolean)
+
+    /**
+     * Get the keywords (user defined tags) currently stored for a message.
+     */
+    fun getMessageKeywords(messageServerId: String): Set<String>
+
+    /**
+     * Replace the keywords (user defined tags) stored for a message.
+     */
+    fun setMessageKeywords(messageServerId: String, keywords: Set<String>)
     suspend fun saveMessage(message: Message, downloadState: MessageDownloadState)
     fun getOldestMessageDate(): Date?
     fun getFolderExtraString(name: String): String?

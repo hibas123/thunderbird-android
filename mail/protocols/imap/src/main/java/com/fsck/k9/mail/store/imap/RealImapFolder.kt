@@ -761,6 +761,7 @@ internal class RealImapFolder(
         if (fetchList.containsKey("FLAGS")) {
             val flags = fetchList.getKeyedList("FLAGS")
             if (flags != null) {
+                val keywords = mutableSetOf<String>()
                 for (i in flags.indices) {
                     val flag = flags.getString(i)
                     when {
@@ -789,8 +790,13 @@ internal class RealImapFolder(
                         flag.equals("\\Draft", ignoreCase = true) -> {
                             message.setFlag(Flag.DRAFT, true)
                         }
+
+                        ImapKeywords.isUserVisibleKeyword(flag) -> {
+                            keywords.add(flag)
+                        }
                     }
                 }
+                message.keywords = keywords
             }
         }
 

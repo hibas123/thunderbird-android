@@ -5,6 +5,7 @@ import app.k9mail.legacy.mailstore.MessageMapper
 import app.k9mail.legacy.message.extractors.PreviewResult.PreviewType
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -426,6 +427,43 @@ class RetrieveMessageListOperationsTest : RobolectricTest() {
         }
 
         assertThat(result).containsExactly("OK")
+    }
+
+    @Test
+    fun `getMessages() should return keywords of message`() {
+        val folderId = sqliteDatabase.createFolder()
+        val messageId = sqliteDatabase.createMessage(folderId, uid = "uid1")
+        sqliteDatabase.createThread(messageId)
+        sqliteDatabase.createKeyword(messageId, "\$label1")
+        sqliteDatabase.createKeyword(messageId, "Custom")
+        val otherMessageId = sqliteDatabase.createMessage(folderId, uid = "uid2")
+        sqliteDatabase.createThread(otherMessageId)
+
+        val result = getMessagesFromFolder(folderId) { message -> message.id to message.keywords }
+
+        assertThat(result).containsExactlyInAnyOrder(
+            messageId to setOf("\$label1", "Custom"),
+            otherMessageId to emptySet(),
+        )
+    }
+
+    @Test
+    fun `getThreadedMessages() should return union of keywords of all messages in thread`() {
+        val folderId = sqliteDatabase.createFolder()
+        val messageId1 = sqliteDatabase.createMessage(folderId, uid = "uid1")
+        val threadId1 = sqliteDatabase.createThread(messageId1)
+        val messageId2 = sqliteDatabase.createMessage(folderId, uid = "uid2")
+        sqliteDatabase.createThread(messageId2, root = threadId1)
+        val deletedMessageId = sqliteDatabase.createMessage(folderId, uid = "uid3", deleted = true)
+        sqliteDatabase.createThread(deletedMessageId, root = threadId1)
+        sqliteDatabase.createKeyword(messageId1, "\$label1")
+        sqliteDatabase.createKeyword(messageId2, "\$label1")
+        sqliteDatabase.createKeyword(messageId2, "Custom")
+        sqliteDatabase.createKeyword(deletedMessageId, "Hidden")
+
+        val result = getThreadedMessagesFromFolder(folderId) { message -> message.keywords }
+
+        assertThat(result).containsExactly(setOf("\$label1", "Custom"))
     }
 
     @Test

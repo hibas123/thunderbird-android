@@ -52,6 +52,7 @@ class K9MessageStore(
         localMessageUidPrefixProvider = localMessageUidPrefixProvider,
     )
     private val flagMessageOperations = FlagMessageOperations(database)
+    private val keywordMessageOperations = KeywordMessageOperations(database)
     private val updateMessageOperations = UpdateMessageOperations(database)
     private val retrieveMessageOperations = RetrieveMessageOperations(database, localMessageUidPrefixProvider)
     private val retrieveMessageListOperations = RetrieveMessageListOperations(database)
@@ -114,6 +115,14 @@ class K9MessageStore(
 
     override fun getMessageFlags(folderId: Long, messageServerId: String): Set<Flag> {
         return retrieveMessageOperations.getMessageFlags(folderId, messageServerId)
+    }
+
+    override fun getMessageKeywords(folderId: Long, messageServerId: String): Set<String> {
+        return keywordMessageOperations.getMessageKeywords(folderId, messageServerId)
+    }
+
+    override fun setMessageKeywords(folderId: Long, messageServerId: String, keywords: Set<String>) {
+        keywordMessageOperations.setMessageKeywords(folderId, messageServerId, keywords)
     }
 
     override fun getAllMessagesAndEffectiveDates(folderId: Long): Map<String, Long?> {

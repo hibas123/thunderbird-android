@@ -12,7 +12,7 @@ import net.thunderbird.legacy.logging.Log;
 
 
 class StoreSchemaDefinition implements SchemaDefinition {
-    static final int DB_VERSION = 91;
+    static final int DB_VERSION = 92;
 
     private final MigrationsHelper migrationsHelper;
 
@@ -263,6 +263,13 @@ class StoreSchemaDefinition implements SchemaDefinition {
 
         db.execSQL("DROP TABLE IF EXISTS messages_fulltext");
         db.execSQL("CREATE VIRTUAL TABLE messages_fulltext USING fts4 (fulltext)");
+
+        db.execSQL("DROP TABLE IF EXISTS message_keywords");
+        db.execSQL("CREATE TABLE message_keywords (" +
+                "message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE," +
+                "keyword TEXT NOT NULL," +
+                "PRIMARY KEY (message_id, keyword)" +
+                ")");
 
         db.execSQL("DROP TABLE IF EXISTS notifications");
         db.execSQL("CREATE TABLE notifications (" +

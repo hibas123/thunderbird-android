@@ -545,7 +545,7 @@ internal class ImapSync(
                 override suspend fun onFetchResponse(message: ImapMessage, isFirstResponse: Boolean) {
                     try {
                         // Store the updated message locally
-                        backendFolder.saveMessage(message, MessageDownloadState.FULL)
+                        saveMessageWithKeywords(backendFolder, message, MessageDownloadState.FULL)
 
                         if (isFirstResponse) {
                             progress.incrementAndGet()
@@ -702,7 +702,7 @@ internal class ImapSync(
         )
 
         // Store the updated message locally
-        backendFolder.saveMessage(message, MessageDownloadState.PARTIAL)
+        saveMessageWithKeywords(backendFolder, message, MessageDownloadState.PARTIAL)
     }
 
     private suspend fun downloadPartial(
@@ -728,7 +728,20 @@ internal class ImapSync(
         }
 
         // Store the updated message locally
-        backendFolder.saveMessage(message, MessageDownloadState.PARTIAL)
+        saveMessageWithKeywords(backendFolder, message, MessageDownloadState.PARTIAL)
+    }
+
+    private suspend fun saveMessageWithKeywords(
+        backendFolder: BackendFolder,
+        message: ImapMessage,
+        downloadState: MessageDownloadState,
+    ) {
+        backendFolder.saveMessage(message, downloadState)
+
+        // Only write keywords when we know about some. Messages fetched without FLAGS must not clear stored keywords.
+        if (message.keywords.isNotEmpty()) {
+            backendFolder.setMessageKeywords(message.uid, message.keywords)
+        }
     }
 
     private fun syncFlags(syncConfig: SyncConfig, backendFolder: BackendFolder, remoteMessage: ImapMessage): Boolean {
@@ -750,6 +763,11 @@ internal class ImapSync(
                     backendFolder.setMessageFlag(messageServerId, flag, remoteMessage.isSet(flag))
                     messageChanged = true
                 }
+            }
+
+            if (remoteMessage.keywords != backendFolder.getMessageKeywords(messageServerId)) {
+                backendFolder.setMessageKeywords(messageServerId, remoteMessage.keywords)
+                messageChanged = true
             }
         }
 

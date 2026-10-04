@@ -410,6 +410,7 @@ class MessageListRepositoryTest {
                     override val isAnswered = message.isAnswered
                     override val isForwarded = message.isForwarded
                     override val hasAttachments = false
+                    override val keywords = emptySet<String>()
                     override val threadRoot = message.threadRoot
                     override val threadCount = 0
                 },

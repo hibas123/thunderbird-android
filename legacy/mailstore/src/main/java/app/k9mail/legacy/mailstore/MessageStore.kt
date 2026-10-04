@@ -119,6 +119,16 @@ interface MessageStore {
     fun getMessageFlags(folderId: Long, messageServerId: String): Set<Flag>
 
     /**
+     * Get the keywords (user defined tags) associated with a message.
+     */
+    fun getMessageKeywords(folderId: Long, messageServerId: String): Set<String>
+
+    /**
+     * Replace the keywords (user defined tags) associated with a message.
+     */
+    fun setMessageKeywords(folderId: Long, messageServerId: String, keywords: Set<String>)
+
+    /**
      * Retrieve server IDs and dates for all remote messages in the given folder.
      */
     fun getAllMessagesAndEffectiveDates(folderId: Long): Map<String, Long?>

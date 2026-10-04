@@ -206,6 +206,41 @@ class ImapSyncTest {
     }
 
     @Test
+    fun `sync should store keywords of new messages`() = runTest {
+        addMessageToImapFolder(uid = 5)
+        imapFolder.setKeywords(uid = 5, keywords = setOf("\$label1", "Custom"))
+
+        imapSync.sync(FOLDER_SERVER_ID, defaultSyncConfig, syncListener)
+
+        assertThat(backendFolder.getMessageKeywords(messageServerId = "5"))
+            .containsExactlyInAnyOrder("\$label1", "Custom")
+    }
+
+    @Test
+    fun `sync should update keywords of existing messages`() = runTest {
+        addMessageToBackendFolder(uid = 2)
+        backendFolder.setMessageKeywords(messageServerId = "2", keywords = setOf("Old", "Keep"))
+        addMessageToImapFolder(uid = 2)
+        imapFolder.setKeywords(uid = 2, keywords = setOf("Keep", "New"))
+
+        imapSync.sync(FOLDER_SERVER_ID, defaultSyncConfig, syncListener)
+
+        assertThat(backendFolder.getMessageKeywords(messageServerId = "2"))
+            .containsExactlyInAnyOrder("Keep", "New")
+    }
+
+    @Test
+    fun `sync should remove keywords that were removed on the server`() = runTest {
+        addMessageToBackendFolder(uid = 2)
+        backendFolder.setMessageKeywords(messageServerId = "2", keywords = setOf("Old"))
+        addMessageToImapFolder(uid = 2)
+
+        imapSync.sync(FOLDER_SERVER_ID, defaultSyncConfig, syncListener)
+
+        assertThat(backendFolder.getMessageKeywords(messageServerId = "2")).isEmpty()
+    }
+
+    @Test
     fun `sync with UIDVALIDITY change should clear all messages`() = runTest {
         imapFolder.setUidValidity(1)
         addMessageToImapFolder(uid = 300)

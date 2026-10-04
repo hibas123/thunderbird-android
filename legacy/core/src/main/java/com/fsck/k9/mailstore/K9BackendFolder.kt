@@ -83,6 +83,14 @@ class K9BackendFolder(
         messageStore.setMessageFlag(folderId, messageServerId, flag, value)
     }
 
+    override fun getMessageKeywords(messageServerId: String): Set<String> {
+        return messageStore.getMessageKeywords(folderId, messageServerId)
+    }
+
+    override fun setMessageKeywords(messageServerId: String, keywords: Set<String>) {
+        messageStore.setMessageKeywords(folderId, messageServerId, keywords)
+    }
+
     override suspend fun saveMessage(message: LegacyMessage, downloadState: MessageDownloadState) {
         requireMessageServerId(message)
 

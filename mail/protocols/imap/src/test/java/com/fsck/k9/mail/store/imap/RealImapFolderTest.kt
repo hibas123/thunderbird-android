@@ -1118,6 +1118,25 @@ class RealImapFolderTest {
     }
 
     @Test
+    fun `fetch with flags fetch profile should collect user keywords`() = runTest {
+        val folder = createFolder("Folder")
+        prepareImapFolderForOpen(OpenMode.READ_ONLY)
+        folder.open(OpenMode.READ_ONLY)
+        val message = ImapMessage("1")
+        val fetchProfile = createFetchProfile(FetchProfile.Item.FLAGS)
+        whenever(imapConnection.readResponse(anyOrNull()))
+            .thenReturn(
+                createImapResponse("* 1 FETCH (FLAGS (\\Seen \$label1 Custom \$MDNSent \\Recent) UID 1)"),
+            )
+            .thenReturn(createImapResponse("x OK"))
+
+        folder.fetch(listOf(message), fetchProfile, null, MAX_DOWNLOAD_SIZE)
+
+        assertThat(message.isSet(Flag.SEEN)).isTrue()
+        assertThat(message.keywords).isEqualTo(setOf("\$label1", "Custom"))
+    }
+
+    @Test
     fun `fetchPart() on closed folder should throw`() {
         val folder = createFolder("Folder")
         val message = createImapMessage("1")

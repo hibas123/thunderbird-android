@@ -46,6 +46,11 @@ class NotifierMessageStore(
         notifyChange()
     }
 
+    override fun setMessageKeywords(folderId: Long, messageServerId: String, keywords: Set<String>) {
+        messageStore.setMessageKeywords(folderId, messageServerId, keywords)
+        notifyChange()
+    }
+
     override fun setNewMessageState(folderId: Long, messageServerId: String, newMessage: Boolean) {
         messageStore.setNewMessageState(folderId, messageServerId, newMessage)
         notifyChange()

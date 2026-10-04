@@ -23,6 +23,7 @@ interface MessageDetailsAccessor {
     val isAnswered: Boolean
     val isForwarded: Boolean
     val hasAttachments: Boolean
+    val keywords: Set<String>
     val threadRoot: Long
     val threadCount: Int
 }
