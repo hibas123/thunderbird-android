@@ -25,6 +25,7 @@ import com.fsck.k9.mail.AuthType
 import com.fsck.k9.mail.ConnectionSecurity
 import com.fsck.k9.mail.ServerSettings
 import com.fsck.k9.ui.R
+import com.fsck.k9.ui.messagelist.item.MessageViewHolder
 import com.google.android.material.textview.MaterialTextView
 import kotlin.time.ExperimentalTime
 import net.thunderbird.core.android.account.Identity
@@ -254,6 +255,39 @@ class MessageListAdapterTest : RobolectricTest() {
     }
 
     @Test
+    fun withoutKeywords_shouldHideTagsView() {
+        val adapter = createAdapter()
+        val messageListItem = createMessageListItem(keywords = emptySet())
+
+        val view = adapter.createAndBindView(messageListItem)
+
+        assertThat(view.tagsView).isGone()
+    }
+
+    @Test
+    fun withKeywords_shouldShowTagsView() {
+        val adapter = createAdapter()
+        val messageListItem = createMessageListItem(keywords = setOf("\$label1", "Custom"))
+
+        val view = adapter.createAndBindView(messageListItem)
+
+        assertThat(view.tagsView).isVisible()
+        assertThat(view.tagsView.text.toString()).isEqualTo("Important Custom")
+    }
+
+    @Test
+    fun rebindingWithoutKeywords_shouldHideTagsView() {
+        val adapter = createAdapter()
+        val view = adapter.createAndBindView(createMessageListItem(keywords = setOf("\$label1")))
+        val holder = view.tag as MessageViewHolder
+
+        adapter.viewItems = listOf(MessageListViewItem.Message(createMessageListItem(keywords = emptySet())))
+        adapter.onBindViewHolder(holder, 0)
+
+        assertThat(view.tagsView).isGone()
+    }
+
+    @Test
     fun withoutSenderAboveSubjectAndDefaultFontSize_shouldNotSetTextSizeOfFirstLineView() {
         val adapter = createAdapter(
             fontSizes = createFontSizes(subject = FONT_DEFAULT),
@@ -462,6 +496,7 @@ class MessageListAdapterTest : RobolectricTest() {
         isAnswered: Boolean = false,
         isForwarded: Boolean = false,
         hasAttachments: Boolean = false,
+        keywords: Set<String> = emptySet(),
         uniqueId: Long = 0L,
         folderId: Long = 0L,
         messageUid: String = "irrelevant",
@@ -484,6 +519,7 @@ class MessageListAdapterTest : RobolectricTest() {
             isAnswered,
             isForwarded,
             hasAttachments,
+            keywords,
             uniqueId,
             folderId,
             messageUid,
@@ -554,6 +590,8 @@ class MessageListAdapterTest : RobolectricTest() {
     val View.firstLineView: MaterialTextView get() = findViewById(R.id.subject)
     val View.secondLineView: MaterialTextView get() = findViewById(R.id.preview)
     val View.attachmentCountView: View get() = findViewById(R.id.attachment)
+
+    val View.tagsView: MaterialTextView get() = findViewById(R.id.tags)
     val View.dateView: MaterialTextView get() = findViewById(R.id.date)
 
     private fun Assert<View>.isVisible() = given { actual ->

@@ -55,6 +55,7 @@ class MessageListItemMapper(
             message.isAnswered,
             message.isForwarded,
             message.hasAttachments,
+            message.keywords,
             uniqueId,
             message.folderId,
             message.messageServerId,

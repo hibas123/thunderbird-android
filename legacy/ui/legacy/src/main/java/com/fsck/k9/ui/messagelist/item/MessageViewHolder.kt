@@ -56,6 +56,17 @@ class MessageViewHolder(
     val starClickAreaView: View = view.findViewById(R.id.star_click_area)
     val attachmentView: ImageView = view.findViewById(R.id.attachment)
     val statusView: ImageView = view.findViewById(R.id.status)
+    val tagsView: MaterialTextView = view.findViewById(R.id.tags)
+
+    private val tagResolver = MessageTagResolver(
+        defaultTagNames = listOf(
+            res.getString(R.string.message_tag_important),
+            res.getString(R.string.message_tag_work),
+            res.getString(R.string.message_tag_personal),
+            res.getString(R.string.message_tag_to_do),
+            res.getString(R.string.message_tag_later),
+        ),
+    )
 
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     fun bind(messageListItem: MessageListItem, isActive: Boolean, isSelected: Boolean) {
@@ -144,6 +155,8 @@ class MessageViewHolder(
             attachmentView.isVisible = hasAttachments
             attachmentView.setColorFilter(foregroundColor)
 
+            bindTags(keywords)
+
             val statusHolder = buildStatusHolder(isForwarded, isAnswered)
             if (statusHolder != null) {
                 statusView.setImageDrawable(statusHolder)
@@ -152,6 +165,34 @@ class MessageViewHolder(
                 statusView.isVisible = false
             }
         }
+    }
+
+    private fun bindTags(keywords: Set<String>) {
+        val tags = tagResolver.resolve(keywords)
+        if (tags.isEmpty()) {
+            tagsView.isVisible = false
+            tagsView.text = null
+            return
+        }
+
+        val horizontalPadding = res.getDimension(R.dimen.messageListTagHorizontalPadding)
+        val cornerRadius = res.getDimension(R.dimen.messageListTagCornerRadius)
+        val tagsText = SpannableStringBuilder()
+        for (tag in tags) {
+            if (tagsText.isNotEmpty()) tagsText.append(' ')
+
+            val start = tagsText.length
+            tagsText.append(tag.name)
+            tagsText.setSpan(
+                TagSpan(tag.color, horizontalPadding, cornerRadius),
+                start,
+                tagsText.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+
+        tagsView.setText(tagsText, TextView.BufferType.SPANNABLE)
+        tagsView.isVisible = true
     }
 
     private fun buildSubject(

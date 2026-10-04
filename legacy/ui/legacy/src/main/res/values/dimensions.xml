@@ -20,6 +20,8 @@
     <!-- Message list density: default -->
     <dimen name="messageListDefaultVerticalPadding">12dp</dimen>
     <dimen name="messageListDefaultTextViewMargin">2dp</dimen>
+    <dimen name="messageListTagHorizontalPadding">6dp</dimen>
+    <dimen name="messageListTagCornerRadius">4dp</dimen>
     <item name="messageListDefaultLineSpacingMultiplier" format="float" type="dimen">1.1</item>
 
     <!-- Message list density: relaxed -->

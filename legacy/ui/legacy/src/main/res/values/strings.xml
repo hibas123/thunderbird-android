@@ -1140,6 +1140,13 @@ You can keep this message and use it as a backup for your secret key. If you wan
     <!-- For unread messages the first line of a message list item is modified by this to improve the experience for people with screen readers. -->
     <string name="message_list_content_description_unread_prefix">unread, %s</string>
 
+    <!-- Names of the default message tags. These match the names used by Thunderbird for desktop. -->
+    <string name="message_tag_important">Important</string>
+    <string name="message_tag_work">Work</string>
+    <string name="message_tag_personal">Personal</string>
+    <string name="message_tag_to_do">To Do</string>
+    <string name="message_tag_later">Later</string>
+
     <!-- Name of the "data collection" section in the general settings screen -->
     <string name="settings_ui_data_collection">Data collection</string>
     <!-- Title of the "Usage and technical data" setting used in the "data collection" section of the general settings screen -->

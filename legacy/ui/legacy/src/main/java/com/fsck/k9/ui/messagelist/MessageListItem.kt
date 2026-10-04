@@ -21,6 +21,7 @@ data class MessageListItem(
     val isAnswered: Boolean,
     val isForwarded: Boolean,
     val hasAttachments: Boolean,
+    val keywords: Set<String>,
     val uniqueId: Long,
     val folderId: Long,
     val messageUid: String,

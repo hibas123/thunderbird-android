@@ -88,6 +88,7 @@ private val fakeMessageListItem = MessageListItem(
     isStarred = false,
     isAnswered = false,
     isForwarded = false,
+    keywords = emptySet(),
     hasAttachments = false,
     uniqueId = 42L,
     folderId = 123L,
