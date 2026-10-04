@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,7 @@ import net.thunderbird.feature.mail.message.tags.internal.MessageTagsContract.St
 import net.thunderbird.feature.mail.message.tags.internal.MessageTagsContract.TagItem
 
 private const val COLORS_PER_ROW = 6
-private const val LIGHT_THRESHOLD = 0.6f
+private const val LIGHT_THRESHOLD = 0.5f
 private val COLOR_SWATCH_SIZE = 32.dp
 private val TAG_SWATCH_SIZE = 24.dp
 
@@ -262,7 +263,7 @@ private fun ColorSwatch(
     }
 }
 
-private fun Color.isLight(): Boolean = (0.299f * red + 0.587f * green + 0.114f * blue) > LIGHT_THRESHOLD
+private fun Color.isLight(): Boolean = luminance() > LIGHT_THRESHOLD
 
 @StringRes
 private fun KeywordError.messageResId(): Int = when (this) {
