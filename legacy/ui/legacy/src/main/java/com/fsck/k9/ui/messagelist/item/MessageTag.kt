@@ -1,6 +1,7 @@
 package com.fsck.k9.ui.messagelist.item
 
 import androidx.annotation.ColorInt
+import net.thunderbird.core.preference.display.visualSettings.message.tags.DefaultMessageTags
 import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettings
 
 /**
@@ -23,8 +24,8 @@ internal data class MessageTag(
  */
 internal class MessageTagResolver(private val defaultTagNames: List<String>) {
     init {
-        require(defaultTagNames.size == DEFAULT_TAG_COLORS.size) {
-            "Expected ${DEFAULT_TAG_COLORS.size} default tag names, got ${defaultTagNames.size}"
+        require(defaultTagNames.size == DefaultMessageTags.tags.size) {
+            "Expected ${DefaultMessageTags.tags.size} default tag names, got ${defaultTagNames.size}"
         }
     }
 
@@ -36,11 +37,15 @@ internal class MessageTagResolver(private val defaultTagNames: List<String>) {
     }
 
     private fun createTag(keyword: String, settings: MessageTagSettings): SortableTag {
-        val labelIndex = labelIndexOf(keyword)
+        val labelIndex = DefaultMessageTags.indexOf(keyword)
         val customization = settings.find(keyword)
 
         val defaultName = if (labelIndex != null) defaultTagNames[labelIndex] else keyword
-        val defaultColor = if (labelIndex != null) DEFAULT_TAG_COLORS[labelIndex] else FALLBACK_TAG_COLOR
+        val defaultColor = if (labelIndex != null) {
+            DefaultMessageTags.tags[labelIndex].color
+        } else {
+            DefaultMessageTags.FALLBACK_COLOR
+        }
         val tag = MessageTag(
             keyword = keyword,
             name = customization?.name ?: defaultName,
@@ -54,24 +59,5 @@ internal class MessageTagResolver(private val defaultTagNames: List<String>) {
         }
     }
 
-    private fun labelIndexOf(keyword: String): Int? {
-        val match = LABEL_KEYWORD_REGEX.matchEntire(keyword) ?: return null
-        return match.groupValues[1].toInt() - 1
-    }
-
     private class SortableTag(val tag: MessageTag, val sortGroup: Int, val sortKey: String)
-
-    companion object {
-        private val LABEL_KEYWORD_REGEX = Regex("""\${'$'}label([1-5])""", RegexOption.IGNORE_CASE)
-
-        // Colors used by Thunderbird for desktop for its default tags: Important, Work, Personal, To Do, Later
-        private val DEFAULT_TAG_COLORS = listOf(
-            0xFFFF0000.toInt(),
-            0xFFFF9900.toInt(),
-            0xFF009900.toInt(),
-            0xFF3333FF.toInt(),
-            0xFF993399.toInt(),
-        )
-        private val FALLBACK_TAG_COLOR = 0xFF607D8B.toInt()
-    }
 }

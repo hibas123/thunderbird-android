@@ -62,11 +62,11 @@ class MessageViewHolder(
 
     private val tagResolver = MessageTagResolver(
         defaultTagNames = listOf(
-            res.getString(R.string.message_tag_important),
-            res.getString(R.string.message_tag_work),
-            res.getString(R.string.message_tag_personal),
-            res.getString(R.string.message_tag_to_do),
-            res.getString(R.string.message_tag_later),
+            res.getString(MessageListR.string.message_tag_important),
+            res.getString(MessageListR.string.message_tag_work),
+            res.getString(MessageListR.string.message_tag_personal),
+            res.getString(MessageListR.string.message_tag_to_do),
+            res.getString(MessageListR.string.message_tag_later),
         ),
     )
 
