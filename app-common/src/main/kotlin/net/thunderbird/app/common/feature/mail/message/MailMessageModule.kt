@@ -6,6 +6,8 @@ import com.fsck.k9.mailstore.DefaultAttachmentViewInfoMapper
 import com.fsck.k9.ui.helper.SizeFormatter
 import net.thunderbird.app.common.feature.mail.message.list.LegacyUpdateSortCriteria
 import net.thunderbird.core.android.account.SortType
+import net.thunderbird.core.preference.display.visualSettings.message.tags.DefaultMessageTagSettingsPreferenceManager
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettingsPreferenceManager
 import net.thunderbird.feature.mail.message.list.domain.model.SortCriteria
 import net.thunderbird.feature.mail.message.list.extension.toSortType
 import net.thunderbird.feature.mail.message.reader.api.domain.mapper.AttachmentViewInfoMapper
@@ -27,6 +29,15 @@ internal val mailMessageModule = module {
 
     single<MessageListDomainContract.UseCase.UpdateSortCriteria> {
         LegacyUpdateSortCriteria(logger = get(), accountManager = get())
+    }
+
+    single<MessageTagSettingsPreferenceManager> {
+        DefaultMessageTagSettingsPreferenceManager(
+            logger = get(),
+            storage = get(),
+            storageEditor = get(),
+            preferenceChangeBroker = get(),
+        )
     }
 
     single<AttachmentViewInfoMapper<Part>> {

@@ -21,6 +21,7 @@ import com.fsck.k9.preferences.Settings.IntegerRangeSetting;
 import com.fsck.k9.preferences.Settings.InvalidSettingValueException;
 import com.fsck.k9.preferences.Settings.PseudoEnumSetting;
 import com.fsck.k9.preferences.Settings.SettingsDescription;
+import com.fsck.k9.preferences.Settings.StringSetting;
 import com.fsck.k9.preferences.Settings.V;
 import com.fsck.k9.preferences.Settings.WebFontSizeSetting;
 import com.fsck.k9.preferences.upgrader.GeneralSettingsUpgraderTo24;
@@ -346,6 +347,9 @@ class GeneralSettingsDescriptions {
         ));
         s.put("messageListDateTimeFormat", Settings.versions(
             new V(110, new EnumSetting<>(MessageListDateTimeFormat.class, MessageListDateTimeFormat.Contextual))
+        ));
+        s.put("messageTags", Settings.versions(
+            new V(112, new StringSetting(""))
         ));
 
         // TODO: Add a way to properly support feature-specific settings.

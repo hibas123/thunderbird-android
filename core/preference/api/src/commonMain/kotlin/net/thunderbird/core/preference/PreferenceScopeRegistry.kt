@@ -6,6 +6,7 @@ import net.thunderbird.core.preference.display.inboxSettings.DisplayInboxSetting
 import net.thunderbird.core.preference.display.miscSettings.DisplayMiscSettingKey
 import net.thunderbird.core.preference.display.visualSettings.DisplayVisualSettingKey
 import net.thunderbird.core.preference.display.visualSettings.message.list.DisplayMessageListSettingKey
+import net.thunderbird.core.preference.display.visualSettings.message.tags.MessageTagSettingKey
 import net.thunderbird.core.preference.interaction.InteractionSettingKey
 import net.thunderbird.core.preference.network.NetworkSettingKey
 import net.thunderbird.core.preference.notification.NotificationSettingKey
@@ -39,6 +40,10 @@ object PreferenceScopeRegistry {
 
         DisplayMessageListSettingKey.entries.forEach {
             put(it.value, PreferenceScope.DISPLAY_VISUAL_MESSAGE_LIST)
+        }
+
+        MessageTagSettingKey.entries.forEach {
+            put(it.value, PreferenceScope.DISPLAY_VISUAL_MESSAGE_TAGS)
         }
     }
 
