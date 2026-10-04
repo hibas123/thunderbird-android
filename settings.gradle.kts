@@ -131,6 +131,8 @@ include(
     ":feature:mail:message:composer:internal",
     ":feature:mail:message:list:api",
     ":feature:mail:message:list:internal",
+    ":feature:mail:message:tags:api",
+    ":feature:mail:message:tags:internal",
     ":feature:mail:message:export:api",
     ":feature:mail:message:export:impl-eml",
     ":feature:mail:message:reader:api",

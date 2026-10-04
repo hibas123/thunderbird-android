@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="message_tags_title">Tags</string>
+    <string name="message_tags_description">Tags are labels you can see on messages in the message list. They are stored on the mail server as IMAP keywords and shared with other mail clients.</string>
+    <string name="message_tags_add_tag">Add tag</string>
+    <string name="message_tags_edit_tag_title">Edit tag</string>
+    <string name="message_tags_add_tag_title">Add tag</string>
+    <string name="message_tags_name_label">Name</string>
+    <string name="message_tags_keyword_label">Keyword</string>
+    <string name="message_tags_keyword_supporting_text">The keyword exactly as it is stored on the server, e.g. $label1.</string>
+    <string name="message_tags_keyword_error_empty">Enter a keyword.</string>
+    <string name="message_tags_keyword_error_invalid">Keywords can only contain letters, digits, and common symbols, but no spaces or any of ( ) { % * " \\ ].</string>
+    <string name="message_tags_keyword_error_exists">There already is a tag with this keyword.</string>
+    <string name="message_tags_color_label">Color</string>
+    <string name="message_tags_color_selected">Selected</string>
+    <string name="message_tags_save">Save</string>
+    <string name="message_tags_cancel">Cancel</string>
+    <string name="message_tags_reset">Reset to default</string>
+    <string name="message_tags_delete">Delete</string>
+</resources>

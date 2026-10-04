@@ -10,6 +10,7 @@ import net.thunderbird.feature.account.AccountId
 import net.thunderbird.feature.account.settings.api.AccountSettingsRoute
 import net.thunderbird.feature.debug.settings.navigation.SecretDebugSettingsRoute
 import net.thunderbird.feature.funding.api.FundingRoute
+import net.thunderbird.feature.mail.message.tags.api.MessageTagsRoute
 import net.thunderbird.feature.navigation.changelog.api.ChangeLogMode
 import net.thunderbird.feature.navigation.changelog.api.ChangelogRoute
 
@@ -51,6 +52,10 @@ sealed class FeatureLauncherTarget(
 
     data object Funding : FeatureLauncherTarget(
         deepLinkUri = FundingRoute.Contribution.route().toUri(),
+    )
+
+    data object MessageTags : FeatureLauncherTarget(
+        deepLinkUri = MessageTagsRoute.route().toUri(),
     )
 
     data class Changelog(val changeLogMode: ChangeLogMode) : FeatureLauncherTarget(

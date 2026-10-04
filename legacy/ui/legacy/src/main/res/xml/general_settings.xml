@@ -264,6 +264,12 @@
                 android:title="@string/general_settings_message_list_date_time_format_title"
                 />
 
+            <Preference
+                android:key="message_tags_settings"
+                android:summary="@string/message_tags_settings_summary"
+                android:title="@string/message_tags_settings_title"
+                />
+
             <CheckBoxPreference
                 android:key="messagelist_stars"
                 android:summary="@string/global_settings_flag_summary"
