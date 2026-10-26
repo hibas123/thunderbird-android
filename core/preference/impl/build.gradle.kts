@@ -11,12 +11,8 @@ kotlin {
         commonMain.dependencies {
             api(projects.core.preference.api)
 
-            implementation(projects.core.logging.api)
             implementation(projects.core.common)
-        }
-
-        commonTest.dependencies {
-            implementation(projects.core.logging.testing)
+            implementation(projects.core.logging.api)
         }
     }
 }

@@ -4,19 +4,18 @@ import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import net.thunderbird.core.logging.testing.TestLogger
+import net.thunderbird.components.core.logging.testing.TestLogger
 import net.thunderbird.core.preference.PreferenceChangeBroker
 import net.thunderbird.core.preference.PreferenceChangeSubscriber
 import net.thunderbird.core.preference.PreferenceScope
 import net.thunderbird.core.preference.storage.InMemoryStorage
 import net.thunderbird.core.preference.storage.Storage
 import net.thunderbird.core.preference.storage.StorageEditor
-import net.thunderbird.core.preference.storage.StoragePersister
-import net.thunderbird.core.preference.storage.StorageUpdater
+import net.thunderbird.core.preference.storage.StorageProvider
 
 class DefaultMessageTagSettingsPreferenceManagerTest {
     private val key = MessageTagSettingKey.MessageTags.value
-    private val persister = FakeStoragePersister()
+    private val storageProvider = FakeStorageProvider()
     private val broker = FakePreferenceChangeBroker()
 
     @Test
@@ -28,7 +27,7 @@ class DefaultMessageTagSettingsPreferenceManagerTest {
 
     @Test
     fun `getConfig should load stored value`() {
-        persister.values[key] = "\$label1\tUrgent\t"
+        storageProvider.values[key] = "\$label1\tUrgent\t"
 
         val testSubject = createTestSubject()
 
@@ -42,7 +41,7 @@ class DefaultMessageTagSettingsPreferenceManagerTest {
 
         testSubject.save(settings)
 
-        assertThat(persister.values[key]).isEqualTo("\$label2\tLater\t7")
+        assertThat(storageProvider.values[key]).isEqualTo("\$label2\tLater\t7")
         assertThat(testSubject.getConfig()).isEqualTo(settings)
     }
 
@@ -53,7 +52,7 @@ class DefaultMessageTagSettingsPreferenceManagerTest {
 
         testSubject.save(MessageTagSettings())
 
-        assertThat(persister.values.containsKey(key)).isEqualTo(false)
+        assertThat(storageProvider.values.containsKey(key)).isEqualTo(false)
     }
 
     @Test
@@ -70,7 +69,7 @@ class DefaultMessageTagSettingsPreferenceManagerTest {
     @Test
     fun `receive with matching scope should reload settings`() {
         val testSubject = createTestSubject()
-        persister.values[key] = "tag\tImported\t"
+        storageProvider.values[key] = "tag\tImported\t"
 
         broker.publish(PreferenceScope.DISPLAY_VISUAL_MESSAGE_TAGS)
 
@@ -80,7 +79,7 @@ class DefaultMessageTagSettingsPreferenceManagerTest {
     @Test
     fun `receive with unrelated scope should not reload settings`() {
         val testSubject = createTestSubject()
-        persister.values[key] = "tag\tImported\t"
+        storageProvider.values[key] = "tag\tImported\t"
 
         broker.publish(PreferenceScope.NETWORK)
 
@@ -89,20 +88,17 @@ class DefaultMessageTagSettingsPreferenceManagerTest {
 
     private fun createTestSubject() = DefaultMessageTagSettingsPreferenceManager(
         logger = TestLogger(),
-        storagePersister = persister,
-        storageEditor = persister.createStorageEditor { },
+        storageProvider = storageProvider,
         preferenceChangeBroker = broker,
     )
 
-    /**
-     * Like the real persister, [loadValues] returns a snapshot that doesn't reflect later changes.
-     */
-    private class FakeStoragePersister : StoragePersister {
+    private class FakeStorageProvider : StorageProvider {
         val values = mutableMapOf<String, String>()
 
-        override fun loadValues(): Storage = InMemoryStorage(values.toMap(), TestLogger())
+        override val storage: Storage
+            get() = InMemoryStorage(values.toMap(), TestLogger())
 
-        override fun createStorageEditor(storageUpdater: StorageUpdater): StorageEditor {
+        override fun createStorageEditor(): StorageEditor {
             return object : StorageEditor {
                 private val changes = mutableMapOf<String, String?>()
 

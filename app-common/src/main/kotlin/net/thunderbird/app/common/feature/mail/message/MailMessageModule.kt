@@ -1,7 +1,6 @@
 package net.thunderbird.app.common.feature.mail.message
 
 import com.fsck.k9.K9
-import com.fsck.k9.Preferences
 import com.fsck.k9.mail.Message
 import com.fsck.k9.mail.Part
 import com.fsck.k9.mailstore.DefaultAttachmentViewInfoMapper
@@ -41,8 +40,7 @@ internal val mailMessageModule = module {
     single<MessageTagSettingsPreferenceManager> {
         DefaultMessageTagSettingsPreferenceManager(
             logger = get(),
-            storagePersister = get(),
-            storageEditor = get<Preferences>().createStorageEditor(),
+            storageProvider = get(),
             preferenceChangeBroker = get(),
         )
     }
@@ -64,7 +62,6 @@ internal val mailMessageModule = module {
     single<MessageQueryRepository> {
         DefaultMessageQueryRepository(
             logger = get(),
-            accountManager = get(),
             localStoreProvider = get(),
         )
     }

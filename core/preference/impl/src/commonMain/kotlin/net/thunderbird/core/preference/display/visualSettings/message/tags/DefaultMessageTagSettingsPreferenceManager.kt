@@ -3,19 +3,17 @@ package net.thunderbird.core.preference.display.visualSettings.message.tags
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import net.thunderbird.core.logging.Logger
+import net.thunderbird.components.core.logging.Logger
 import net.thunderbird.core.preference.PreferenceChangeBroker
 import net.thunderbird.core.preference.PreferenceChangeSubscriber
 import net.thunderbird.core.preference.PreferenceScope
-import net.thunderbird.core.preference.storage.StorageEditor
-import net.thunderbird.core.preference.storage.StoragePersister
+import net.thunderbird.core.preference.storage.StorageProvider
 
 private const val TAG = "DefaultMessageTagSettingsPreferenceManager"
 
 class DefaultMessageTagSettingsPreferenceManager(
     private val logger: Logger,
-    private val storagePersister: StoragePersister,
-    private val storageEditor: StorageEditor,
+    private val storageProvider: StorageProvider,
     preferenceChangeBroker: PreferenceChangeBroker,
 ) : MessageTagSettingsPreferenceManager, PreferenceChangeSubscriber {
 
@@ -36,13 +34,13 @@ class DefaultMessageTagSettingsPreferenceManager(
     override fun getConfigFlow(): Flow<MessageTagSettings> = configState
 
     private fun loadConfig(): MessageTagSettings {
-        // Always load fresh values. A cached Storage instance would not contain changes made after it was created.
-        val storage = storagePersister.loadValues()
+        val storage = storageProvider.storage
         return MessageTagSettingsCodec.decode(storage.getStringOrNull(MessageTagSettingKey.MessageTags.value))
     }
 
     private fun writeConfig(config: MessageTagSettings) {
         val value = if (config.tags.isEmpty()) null else MessageTagSettingsCodec.encode(config)
+        val storageEditor = storageProvider.createStorageEditor()
         storageEditor.putString(MessageTagSettingKey.MessageTags.value, value)
         storageEditor.commit().also { committed ->
             logger.verbose(TAG) { "writeConfig: storageEditor.commit() resulted in: $committed" }
